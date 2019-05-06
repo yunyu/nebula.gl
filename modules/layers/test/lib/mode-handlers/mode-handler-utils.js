@@ -17,7 +17,7 @@ export function mockHandleStartDragging(
   const dragEvent = createPointerDragEvent(clickCoordinates, moveCoordinates, [
     { index: picksIndex }
   ]);
-  return handler.handleStartDragging(dragEvent);
+  return handler.handleStartDraggingAdapter(dragEvent);
 }
 
 export function mockHandlePointerMove(
@@ -26,7 +26,7 @@ export function mockHandlePointerMove(
 ) {
   const { clickCoordinates, picksIndex } = eventOptions;
   const moveEvent = createPointerMoveEvent(clickCoordinates, [{ index: picksIndex }]);
-  return handler.handlePointerMove(moveEvent);
+  return handler.handlePointerMoveAdapter(moveEvent);
 }
 
 export function mockHandleStopDragging(
@@ -37,7 +37,7 @@ export function mockHandleStopDragging(
   const dragEvent = createPointerDragEvent(clickCoordinates, moveCoordinates, [
     { index: picksIndex }
   ]);
-  return handler.handleStopDragging(dragEvent);
+  return handler.handleStopDraggingAdapter(dragEvent);
 }
 
 export function mockFeatureMove(
@@ -61,7 +61,7 @@ export function testModeHandlerHandlePointMove(
   featureCollection: FeatureCollection,
   isActionEnabledName: string
 ) {
-  describe('handlePointerMove()', () => {
+  describe('handlePointerMoveAdapter()', () => {
     let handler;
 
     beforeEach(() => {
@@ -141,7 +141,7 @@ export function testHandleStartDragging(
   isActionEnabledName: string,
   getGeometryBeforeActionName: string
 ) {
-  describe('handleStartDragging()', () => {
+  describe('handleStartDraggingAdapter()', () => {
     let handler;
 
     beforeEach(() => {
@@ -213,7 +213,7 @@ export function testHandleStopDragging(
     });
   }
 
-  describe('handleStopDragging()', () => {
+  describe('handleStopDraggingAdapter()', () => {
     Object.values(FeatureType)
       .filter(featureFilter)
       .forEach(featureType => {

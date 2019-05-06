@@ -340,50 +340,50 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     expect(snappedEvent).toEqual(originalEvent);
   });
 
-  test('handleStartDragging()', () => {
+  test('handleStartDraggingAdapter()', () => {
     const eventWithPicks = createPointerDragEvent(
       [20, 20],
       [20, 20],
       [{ isGuide: true, object: mockNonPickedHandle }]
     );
     // $FlowFixMe
-    translateHandler.handleStartDragging = jest.fn();
-    snappableHandler.handleStartDragging(eventWithPicks);
+    translateHandler.handleStartDraggingAdapter = jest.fn();
+    snappableHandler.handleStartDraggingAdapter(eventWithPicks);
 
     expect(snappableHandler._startDragSnapHandlePosition).toEqual(mockNonPickedHandle.position);
-    expect(translateHandler.handleStartDragging).toBeCalled();
-    expect(translateHandler.handleStartDragging).toBeCalledWith(eventWithPicks);
+    expect(translateHandler.handleStartDraggingAdapter).toBeCalled();
+    expect(translateHandler.handleStartDraggingAdapter).toBeCalledWith(eventWithPicks);
   });
 
-  test('handleStartDragging() - no picks', () => {
+  test('handleStartDraggingAdapter() - no picks', () => {
     // $FlowFixMe
-    translateHandler.handleStartDragging = jest.fn(v => v);
+    translateHandler.handleStartDraggingAdapter = jest.fn(v => v);
 
     const event = createPointerDragEvent([20, 20], [20, 20]);
-    const eventSummary = snappableHandler.handleStartDragging(event);
+    const eventSummary = snappableHandler.handleStartDraggingAdapter(event);
     expect(eventSummary).toBeDefined();
 
     expect(snappableHandler._startDragSnapHandlePosition).not.toBeDefined();
-    expect(translateHandler.handleStartDragging).toBeCalled();
-    expect(translateHandler.handleStartDragging).toBeCalledWith(event);
+    expect(translateHandler.handleStartDraggingAdapter).toBeCalled();
+    expect(translateHandler.handleStartDraggingAdapter).toBeCalledWith(event);
   });
 
-  test('handleStopDragging()', () => {
+  test('handleStopDraggingAdapter()', () => {
     snappableHandler._isSnapped = true;
     snappableHandler._editHandlePicks = {
       pickedHandle: mockPickedHandle,
       potentialSnapHandle: mockNonPickedHandle
     };
     // $FlowFixMe
-    translateHandler.handleStopDragging = jest.fn(v => v);
+    translateHandler.handleStopDraggingAdapter = jest.fn(v => v);
 
     const event = createPointerDragEvent([20, 20], [20, 20]);
-    const eventSummary = snappableHandler.handleStopDragging(event);
+    const eventSummary = snappableHandler.handleStopDraggingAdapter(event);
     expect(eventSummary).toBeDefined();
 
     expect(snappableHandler._editHandlePicks).toBeNull();
     expect(snappableHandler._isSnapped).toBeFalsy();
-    expect(translateHandler.handleStopDragging).toBeCalled();
+    expect(translateHandler.handleStopDraggingAdapter).toBeCalled();
   });
 
   test('getCursor()', () => {
@@ -397,7 +397,7 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     expect(translateHandler.getCursor).toBeCalledWith(event);
   });
 
-  test('handlePointerMove() - positive case', () => {
+  test('handlePointerMoveAdapter() - positive case', () => {
     snappableHandler.setModeConfig({ enableSnapping: true });
     snappableHandler._editHandlePicks = {
       pickedHandle: mockPickedHandle,
@@ -415,9 +415,9 @@ describe('SnappableHandler - TranslateHandler tests', () => {
       })
     };
     // $FlowFixMe
-    translateHandler.handlePointerMove = jest.fn(v => mockedEditActionSummary);
+    translateHandler.handlePointerMoveAdapter = jest.fn(v => mockedEditActionSummary);
     const event = createPointerMoveEvent([20, 20]);
-    const eventSummary = snappableHandler.handlePointerMove(event);
+    const eventSummary = snappableHandler.handlePointerMoveAdapter(event);
     expect(eventSummary).toBeDefined();
 
     expect(snappableHandler._performSnapIfRequired).toBeCalled();
@@ -426,7 +426,7 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     expect(snappableHandler._updatePickedHandlePosition.mock.calls[0]).toMatchSnapshot();
   });
 
-  test('handlePointerMove() - this._getEditHandlePicks does not return anything', () => {
+  test('handlePointerMoveAdapter() - this._getEditHandlePicks does not return anything', () => {
     snappableHandler.setModeConfig({ enableSnapping: true });
     snappableHandler._editHandlePicks = {
       pickedHandle: mockPickedHandle,
@@ -446,9 +446,9 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     // $FlowFixMe
     snappableHandler._getEditHandlePicks = jest.fn(v => null);
     // $FlowFixMe
-    translateHandler.handlePointerMove = jest.fn(v => mockedEditActionSummary);
+    translateHandler.handlePointerMoveAdapter = jest.fn(v => mockedEditActionSummary);
     const event = createPointerMoveEvent([20, 20]);
-    const eventSummary = snappableHandler.handlePointerMove(event);
+    const eventSummary = snappableHandler.handlePointerMoveAdapter(event);
     expect(eventSummary).toBeDefined();
 
     expect(snappableHandler._performSnapIfRequired).not.toBeCalled();
@@ -457,7 +457,7 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     expect(snappableHandler._updatePickedHandlePosition.mock.calls[0]).toMatchSnapshot();
   });
 
-  test('handlePointerMove() - enableSnapping = false', () => {
+  test('handlePointerMoveAdapter() - enableSnapping = false', () => {
     // $FlowFixMe
     snappableHandler._performSnapIfRequired = jest.fn();
     // $FlowFixMe
@@ -470,9 +470,9 @@ describe('SnappableHandler - TranslateHandler tests', () => {
       })
     };
     // $FlowFixMe
-    translateHandler.handlePointerMove = jest.fn(v => mockedEditActionSummary);
+    translateHandler.handlePointerMoveAdapter = jest.fn(v => mockedEditActionSummary);
     const event = createPointerMoveEvent([20, 20]);
-    const eventSummary = snappableHandler.handlePointerMove(event);
+    const eventSummary = snappableHandler.handlePointerMoveAdapter(event);
     expect(eventSummary).toBeDefined();
 
     expect(snappableHandler._performSnapIfRequired).not.toBeCalled();
@@ -481,7 +481,7 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     expect(snappableHandler._updatePickedHandlePosition.mock.calls[0]).toMatchSnapshot();
   });
 
-  test('handlePointerMove() - editAction does not require pickedHandle position update', () => {
+  test('handlePointerMoveAdapter() - editAction does not require pickedHandle position update', () => {
     // $FlowFixMe
     snappableHandler._performSnapIfRequired = jest.fn();
     // $FlowFixMe
@@ -489,9 +489,12 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     // $FlowFixMe
     snappableHandler._updatePickedHandlePosition = jest.fn();
     // $FlowFixMe
-    translateHandler.handlePointerMove = jest.fn(v => ({ editAction: null, cancelMapPan: true }));
+    translateHandler.handlePointerMoveAdapter = jest.fn(v => ({
+      editAction: null,
+      cancelMapPan: true
+    }));
     const event = createPointerMoveEvent([20, 20]);
-    const eventSummary = snappableHandler.handlePointerMove(event);
+    const eventSummary = snappableHandler.handlePointerMoveAdapter(event);
     expect(eventSummary).toBeDefined();
 
     expect(snappableHandler._performSnapIfRequired).not.toBeCalled();

@@ -48,7 +48,7 @@ function testDuplicatingSingleFeature(featureType) {
   });
 }
 
-describe('handleStartDragging()', () => {
+describe('handleStartDraggingAdapter()', () => {
   let handler;
 
   beforeEach(() => {
