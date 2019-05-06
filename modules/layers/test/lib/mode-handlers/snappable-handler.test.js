@@ -74,8 +74,8 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     const startDragSnapHandlePosition = [19, 15];
     snappableHandler._startDragSnapHandlePosition = startDragSnapHandlePosition;
     const expectedSnappedMouseEvent = Object.assign({}, initialMoveEvent, {
-      groundCoords: snapPos,
-      pointerDownGroundCoords: startDragSnapHandlePosition
+      mapCoords: snapPos,
+      pointerDownMapCoords: startDragSnapHandlePosition
     });
     const snappedMouseEvent = snappableHandler._getSnappedMouseEvent(initialMoveEvent, snapPos);
     expect(snappedMouseEvent).toEqual(expectedSnappedMouseEvent);
@@ -91,9 +91,7 @@ describe('SnappableHandler - TranslateHandler tests', () => {
       ]
     );
     mouseMoveEvent.screenCoords = [1, 1];
-    mouseMoveEvent.pointerDownPicks = [
-      { index: 0, isEditingHandle: true, object: mockPickedHandle }
-    ];
+    mouseMoveEvent.pointerDownPicks = [{ index: 0, isGuide: true, object: mockPickedHandle }];
 
     const picks = snappableHandler._getEditHandlePicks(mouseMoveEvent);
     expect(picks.pickedHandle).toBeDefined();
@@ -320,7 +318,7 @@ describe('SnappableHandler - TranslateHandler tests', () => {
 
   test('_getSnapAwareEvent() - potentialSnapHandle is present', () => {
     const pointerDownPos = [19, 15];
-    const screenGroundCoords = mockNonPickedHandle.position;
+    const screenMapCoords = mockNonPickedHandle.position;
 
     snappableHandler._isSnapped = true;
     snappableHandler._startDragSnapHandlePosition = pointerDownPos;
@@ -329,8 +327,8 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     const originalEvent = createPointerMoveEvent([1, 1]);
     const expectedSnappedEvent = {
       ...originalEvent,
-      groundCoords: screenGroundCoords,
-      pointerDownGroundCoords: pointerDownPos
+      mapCoords: screenMapCoords,
+      pointerDownMapCoords: pointerDownPos
     };
     const snappedEvent = snappableHandler._getSnapAwareEvent(originalEvent);
     expect(snappedEvent).toEqual(expectedSnappedEvent);
@@ -346,7 +344,7 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     const eventWithPicks = createPointerDragEvent(
       [20, 20],
       [20, 20],
-      [{ isEditingHandle: true, object: mockNonPickedHandle }]
+      [{ isGuide: true, object: mockNonPickedHandle }]
     );
     // $FlowFixMe
     translateHandler.handleStartDragging = jest.fn();

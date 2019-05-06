@@ -33,8 +33,8 @@ export class SnappableHandler extends ModeHandler {
 
   _getSnappedMouseEvent(event: Object, snapPoint: Position): PointerMoveEvent {
     return Object.assign({}, event, {
-      groundCoords: snapPoint,
-      pointerDownGroundCoords: this._startDragSnapHandlePosition
+      mapCoords: snapPoint,
+      pointerDownMapCoords: this._startDragSnapHandlePosition
     });
   }
 
@@ -58,7 +58,8 @@ export class SnappableHandler extends ModeHandler {
     const { pickedHandle } = this._editHandlePicks || {};
 
     if (pickedHandle && editAction) {
-      const { featureIndexes, updatedData } = editAction;
+      const { editContext, updatedData } = editAction;
+      const { featureIndexes } = editContext;
 
       for (let i = 0; i < featureIndexes.length; i++) {
         const selectedIndex = featureIndexes[i];
@@ -112,9 +113,9 @@ export class SnappableHandler extends ModeHandler {
   // If no snap handle has been picked, only display the edit handles of the
   // selected feature. If a snap handle has been picked, display said snap handle
   // along with all snappable points on all non-selected features.
-  getEditHandles(picks?: Array<Object>, groundCoords?: Position): any[] {
+  getEditHandles(picks?: Array<Object>, mapCoords?: Position): any[] {
     const { enableSnapping } = this._modeConfig || {};
-    const handles = this._handler.getEditHandles(picks, groundCoords);
+    const handles = this._handler.getEditHandles(picks, mapCoords);
 
     if (!enableSnapping) return handles;
     const { pickedHandle } = this._editHandlePicks || {};
