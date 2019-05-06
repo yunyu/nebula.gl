@@ -79,7 +79,7 @@ export class CompositeModeHandler extends ModeHandler {
     );
   }
 
-  getCursor({ isDragging }: { isDragging: boolean }): string {
-    return this._coalesce(handler => handler.getCursor({ isDragging }));
+  getCursorAdapter({ isDragging }: { isDragging: boolean }): string {
+    return this._coalesce(handler => handler.getCursorAdapter({ isDragging }));
   }
 }
