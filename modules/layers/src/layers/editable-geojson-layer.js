@@ -23,13 +23,14 @@ import { DrawCircleByBoundingBoxHandler } from '../mode-handlers/draw-circle-by-
 import { DrawEllipseByBoundingBoxHandler } from '../mode-handlers/draw-ellipse-by-bounding-box-handler.js';
 import { DrawEllipseUsingThreePointsHandler } from '../mode-handlers/draw-ellipse-using-three-points-handler.js';
 
-import type { EditAction } from '../mode-handlers/mode-handler.js';
+import type { EditAction } from '../mode-handlers/edit-mode.js';
 import type {
   ClickEvent,
   StartDraggingEvent,
   StopDraggingEvent,
   PointerMoveEvent
 } from '../event-types.js';
+import type { FeatureCollection } from '../geojson-types.js';
 import { ExtrudeHandler } from '../mode-handlers/extrude-handler.js';
 import EditableLayer from './editable-layer.js';
 
@@ -154,7 +155,7 @@ const defaultProps = {
 type Props = {
   mode: string,
   modeHandlers: { [mode: string]: ModeHandler },
-  onEdit: EditAction => void,
+  onEdit: (EditAction<FeatureCollection>) => void,
   // TODO: type the rest
   [string]: any
 };
@@ -217,6 +218,7 @@ export default class EditableGeoJsonLayer extends EditableLayer {
     super.initializeState();
 
     this.setState({
+      cursor: 'grab',
       selectedFeatures: [],
       editHandles: []
     });
@@ -317,7 +319,9 @@ export default class EditableGeoJsonLayer extends EditableLayer {
         tentativeFeature: this.state.tentativeFeature,
         editHandles: this.state.editHandles
       },
-      onEdit: () => {},
+      onEdit: (editAction: EditAction<FeatureCollection>) => {
+        props.onEdit(editAction);
+      },
       onUpdateGuides: guides => {
         if (guides) {
           this.setState({
@@ -332,6 +336,9 @@ export default class EditableGeoJsonLayer extends EditableLayer {
         }
         this.setLayerNeedsUpdate();
         this.setNeedsRedraw();
+      },
+      onUpdateCursor: cursor => {
+        this.setState({ cursor });
       }
     });
   }
@@ -503,15 +510,7 @@ export default class EditableGeoJsonLayer extends EditableLayer {
   }
 
   onPointerMove(event: PointerMoveEvent) {
-    const { sourceEvent } = event;
-
-    const { editAction, cancelMapPan } = this.state.modeHandler.handlePointerMove(event);
-
-    if (cancelMapPan) {
-      // TODO: find a less hacky way to prevent map panning
-      // Stop propagation to prevent map panning while dragging an edit handle
-      sourceEvent.stopPropagation();
-    }
+    const { editAction } = this.state.modeHandler.handlePointerMove(event);
 
     if (editAction) {
       this.props.onEdit(editAction);
@@ -519,7 +518,8 @@ export default class EditableGeoJsonLayer extends EditableLayer {
   }
 
   getCursor({ isDragging }: { isDragging: boolean }) {
-    return this.state.modeHandler.getCursor({ isDragging });
+    // return this.state.modeHandler.getCursor({ isDragging });
+    return this.state.cursor;
   }
 }
 

@@ -2,7 +2,7 @@
 
 import type { Feature, FeatureCollection, Position } from '../geojson-types.js';
 import type { PointerMoveEvent, StartDraggingEvent, StopDraggingEvent } from '../event-types.js';
-import type { EditHandle, EditAction } from './mode-handler.js';
+import type { EditHandle, FeatureCollectionEditAction } from './mode-handler.js';
 import { ModeHandler, getPickedEditHandle, getEditHandlesForGeometry } from './mode-handler.js';
 
 type HandlePicks = { pickedHandle?: EditHandle, potentialSnapHandle?: EditHandle };
@@ -54,7 +54,7 @@ export class SnappableHandler extends ModeHandler {
     return handles;
   }
 
-  _updatePickedHandlePosition(editAction: EditAction) {
+  _updatePickedHandlePosition(editAction: FeatureCollectionEditAction) {
     const { pickedHandle } = this._editHandlePicks || {};
 
     if (pickedHandle && editAction) {
@@ -162,12 +162,12 @@ export class SnappableHandler extends ModeHandler {
       : event;
   }
 
-  handleStartDragging(event: StartDraggingEvent): ?EditAction {
+  handleStartDragging(event: StartDraggingEvent): ?FeatureCollectionEditAction {
     this._startDragSnapHandlePosition = (getPickedEditHandle(event.picks) || {}).position;
     return this._handler.handleStartDragging(event);
   }
 
-  handleStopDragging(event: StopDraggingEvent): ?EditAction {
+  handleStopDragging(event: StopDraggingEvent): ?FeatureCollectionEditAction {
     const modeActionSummary = this._handler.handleStopDragging(this._getSnapAwareEvent(event));
 
     this._editHandlePicks = null;
@@ -179,7 +179,9 @@ export class SnappableHandler extends ModeHandler {
     return this._handler.getCursor(event);
   }
 
-  handlePointerMove(event: PointerMoveEvent): { editAction: ?EditAction, cancelMapPan: boolean } {
+  handlePointerMove(
+    event: PointerMoveEvent
+  ): { editAction: ?FeatureCollectionEditAction, cancelMapPan: boolean } {
     const { enableSnapping } = this._handler.getModeConfig() || {};
 
     if (enableSnapping) {
