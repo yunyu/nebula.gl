@@ -42,22 +42,23 @@ export class EditMode<TData, TGuides> {
   }
 
   updateState(state: ModeState<TData, TGuides>) {
-    const changedEvents: (() => void)[] = [];
-    if (this.state && this.state.data !== state.data) {
+    const prevState = this.state;
+    const changedEvents: ((prevState: ModeState<TData, TGuides>) => void)[] = [];
+    if (!this.state || this.state.data !== state.data) {
       changedEvents.push(this.onDataChanged);
     }
-    if (this.state && this.state.modeConfig !== state.modeConfig) {
+    if (!this.state || this.state.modeConfig !== state.modeConfig) {
       changedEvents.push(this.onModeConfigChanged);
     }
-    if (this.state && this.state.selectedIndexes !== state.selectedIndexes) {
+    if (!this.state || this.state.selectedIndexes !== state.selectedIndexes) {
       changedEvents.push(this.onSelectedIndexesChanged);
     }
-    if (this.state && this.state.guides !== state.guides) {
+    if (!this.state || this.state.guides !== state.guides) {
       changedEvents.push(this.onGuidesChanged);
     }
     this.state = state;
 
-    changedEvents.forEach(fn => fn.bind(this)());
+    changedEvents.forEach(fn => fn.bind(this)(prevState));
   }
 
   // Overridable user interaction handlers
@@ -67,12 +68,15 @@ export class EditMode<TData, TGuides> {
   handleStopDragging(event: StopDraggingEvent): void {}
 
   // Convenience functions to handle state changes
-  onDataChanged(): void {}
-  onModeConfigChanged(): void {}
-  onSelectedIndexesChanged(): void {}
-  onGuidesChanged(): void {}
+  onDataChanged(prevState: ModeState<TData, TGuides>): void {}
+  onModeConfigChanged(prevState: ModeState<TData, TGuides>): void {}
+  onSelectedIndexesChanged(prevState: ModeState<TData, TGuides>): void {}
+  onGuidesChanged(prevState: ModeState<TData, TGuides>): void {}
 
   // Convenience functions to access state
+  getData(): TData {
+    return this.state.data;
+  }
   getModeConfig(): any {
     return this.state.modeConfig;
   }
