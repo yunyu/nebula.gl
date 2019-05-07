@@ -2,7 +2,6 @@
 /* eslint-env browser */
 
 import { GeoJsonLayer, ScatterplotLayer, IconLayer } from '@deck.gl/layers';
-import { ModeHandler } from '../mode-handlers/mode-handler.js';
 import { ViewHandler } from '../mode-handlers/view-handler.js';
 import { ModifyHandler } from '../mode-handlers/modify-handler.js';
 import { ElevationHandler } from '../mode-handlers/elevation-handler.js';
@@ -30,9 +29,8 @@ import type {
   StopDraggingEvent,
   PointerMoveEvent
 } from '../event-types.js';
-import type { EditMode } from '../edit-mode.js';
-import type { EditHandle } from '../mode-handlers/mode-handler.js';
-import type { FeatureCollection, Feature } from '../geojson-types.js';
+import type { FeatureCollectionEditMode } from '../mode-handlers/mode-handler.js';
+import type { FeatureCollection } from '../geojson-types.js';
 import { ExtrudeHandler } from '../mode-handlers/extrude-handler.js';
 import EditableLayer from './editable-layer.js';
 
@@ -156,7 +154,7 @@ const defaultProps = {
 
 type Props = {
   mode: string,
-  modeHandlers: { [mode: string]: ModeHandler },
+  modeHandlers: { [mode: string]: FeatureCollectionEditMode },
   onEdit: (EditAction<FeatureCollection>) => void,
   // TODO: type the rest
   [string]: any
@@ -227,27 +225,15 @@ export default class EditableGeoJsonLayer extends EditableLayer {
   }
 
   setState(partialState: any) {
-    if (partialState && partialState.editHandles) {
-      // console.log(
-      //   'update guides',
-      //   partialState.tentativeFeature && partialState.tentativeFeature.geometry.type,
-      //   partialState.tentativeFeature && partialState.tentativeFeature.geometry.coordinates.length,
-      //   partialState.tentativeFeature &&
-      //     partialState.tentativeFeature.geometry.coordinates[0].length,
-      //   partialState.editHandles.length
-      // );
-      // console.log('update guides', JSON.stringify(partialState));
-    }
-
-    this.updateModeState(this.props);
     super.setState(partialState);
+    this.updateModeState(this.props);
   }
 
+  // TODO: figure out how to properly update state from an outside event handler
   shouldUpdateState() {
     return true;
   }
 
-  // // TODO: figure out how to properly update state from an outside event handler
   // shouldUpdateState(opts: Object) {
   //   let shouldUpdateState = super.shouldUpdateState(opts);
 
@@ -278,7 +264,7 @@ export default class EditableGeoJsonLayer extends EditableLayer {
   }) {
     super.updateState({ props, changeFlags });
 
-    let modeHandler: ModeHandler = this.state.modeHandler;
+    let modeHandler: FeatureCollectionEditMode = this.state.modeHandler;
     if (changeFlags.propsOrDataChanged) {
       if (props.modeHandlers !== oldProps.modeHandlers || props.mode !== oldProps.mode) {
         modeHandler = props.modeHandlers[props.mode];
@@ -286,16 +272,12 @@ export default class EditableGeoJsonLayer extends EditableLayer {
         if (!modeHandler) {
           console.warn(`No handler configured for mode ${props.mode}`); // eslint-disable-line no-console,no-undef
           // Use default mode handler
-          modeHandler = new ModeHandler();
+          modeHandler = new ViewHandler();
         }
 
         if (modeHandler !== this.state.modeHandler) {
           this.setState({ modeHandler });
         }
-
-        modeHandler.setFeatureCollection(props.data);
-      } else if (changeFlags.dataChanged) {
-        modeHandler.setFeatureCollection(props.data);
       }
 
       this.updateModeState(props);
@@ -508,10 +490,7 @@ export default class EditableGeoJsonLayer extends EditableLayer {
     return this.state.cursor;
   }
 
-  getActiveModeHandler(): EditMode<
-    FeatureCollection,
-    { tentativeFeature: ?Feature, editHandles: EditHandle[] }
-  > {
+  getActiveModeHandler(): FeatureCollectionEditMode {
     return this.state.modeHandler;
   }
 }

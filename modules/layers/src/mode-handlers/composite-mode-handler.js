@@ -69,12 +69,16 @@ export class CompositeModeHandler extends ModeHandler {
     return this._coalesce(handler => handler.getTentativeFeature());
   }
 
-  getEditHandles(picks?: Array<Object>, mapCoords?: Position): EditHandle[] {
+  getEditHandlesAdapter(
+    picks?: Array<Object>,
+    mapCoords?: Position,
+    tentativeFeature?: ?Feature
+  ): EditHandle[] {
     // TODO: Combine the handles *BUT* make sure if none of the results have
     // changed to return the same object so that "editHandles !== this.state.editHandles"
     // in editable-geojson-layer works.
     return this._coalesce(
-      handler => handler.getEditHandles(picks, mapCoords),
+      handler => handler.getEditHandlesAdapter(picks, mapCoords, tentativeFeature),
       handles => Array.isArray(handles) && handles.length > 0
     );
   }

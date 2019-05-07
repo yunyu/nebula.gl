@@ -1,18 +1,15 @@
 // @flow
 
-import type { Feature, Polygon, Position } from '../geojson-types.js';
+import type { Polygon, Position } from '../geojson-types.js';
 import type { ClickEvent, PointerMoveEvent } from '../event-types.js';
 import type { FeatureCollectionEditAction, EditHandle } from './mode-handler.js';
 import { ModeHandler, getPickedEditHandle, getEditHandlesForGeometry } from './mode-handler.js';
 
 export class DrawPolygonHandler extends ModeHandler {
-  getEditHandles(
-    picks?: Array<Object>,
-    mapCoords?: Position,
-    tentativeFeature: ?Feature
-  ): EditHandle[] {
-    let handles = super.getEditHandles(picks, mapCoords);
+  getEditHandlesAdapter(picks?: Array<Object>, mapCoords?: Position): EditHandle[] {
+    let handles = super.getEditHandlesAdapter(picks, mapCoords);
 
+    const tentativeFeature = this.getTentativeFeature();
     if (tentativeFeature) {
       handles = handles.concat(getEditHandlesForGeometry(tentativeFeature.geometry, -1));
       // Slice off the handles that are are next to the pointer

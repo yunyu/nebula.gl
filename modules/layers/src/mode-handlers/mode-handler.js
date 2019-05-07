@@ -14,7 +14,7 @@ import type {
   Pick
 } from '../event-types.js';
 import { ImmutableFeatureCollection } from '../immutable-feature-collection.js';
-import { EditMode } from '../edit-mode.js';
+import { EditMode, type ModeState } from '../edit-mode.js';
 
 export type EditHandleType = 'existing' | 'intermediate' | 'snap';
 
@@ -26,17 +26,22 @@ export type EditHandle = {
 };
 
 export type FeatureCollectionEditAction = EditAction<FeatureCollection>;
+export type ModeHandlerGuides = { tentativeFeature: ?Feature, editHandles: EditHandle[] };
 
 const DEFAULT_EDIT_HANDLES: EditHandle[] = [];
 
-export class ModeHandler extends EditMode<
-  FeatureCollection,
-  { tentativeFeature: ?Feature, editHandles: EditHandle[] }
-> {
+export type FeatureCollectionEditMode = EditMode<FeatureCollection, ModeHandlerGuides>;
+
+export class ModeHandler extends EditMode<FeatureCollection, ModeHandlerGuides> {
   // TODO: add underscore
   featureCollection: ImmutableFeatureCollection;
-  _modeConfig: any = null;
   _clickSequence: Position[] = [];
+
+  // TODO: delete once ModeHandlers get by calling getModeConfig()
+  _modeConfig: any = null;
+
+  // TODO: delete me once mode handlers do getEditHandles lazily
+  _tentativeFeature: ?Feature;
 
   constructor(featureCollection?: FeatureCollection) {
     super();
@@ -79,17 +84,17 @@ export class ModeHandler extends EditMode<
     };
   }
 
+  onDataChanged(): void {
+    this.setFeatureCollection(this.getData());
+  }
+
   setFeatureCollection(featureCollection: FeatureCollection): void {
     this.featureCollection = new ImmutableFeatureCollection(featureCollection);
   }
 
-  // getModeConfig(): any {
-  //   return this._modeConfig;
-  // }
-
   // TODO: delete me
   setModeConfig(modeConfig: any): void {
-    console.log('TODO: delete setModeConfig'); // eslint-disable-line
+    console.warn('TODO: call to obsolete setModeConfig'); // eslint-disable-line
   }
 
   // TODO: delete me
@@ -99,17 +104,29 @@ export class ModeHandler extends EditMode<
 
   // TODO: delete me
   setSelectedFeatureIndexes(indexes: number[]): void {
-    console.log('TODO: delete setSelectedFeatureIndexes'); // eslint-disable-line
+    console.warn('TODO: call to obsolete setSelectedFeatureIndexes'); // eslint-disable-line
   }
 
   onSelectedIndexesChanged(): void {
     this._setTentativeFeature(null);
   }
 
-  onGuidesChanged(): void {
-    if (!this.getGuides()) {
+  onGuidesChanged(prevState: ModeState<FeatureCollection, ModeHandlerGuides>): void {
+    const guides = this.getGuides();
+
+    if (!guides) {
       // Reset the click sequence
       this._clickSequence = [];
+    }
+
+    if (
+      prevState &&
+      prevState.guides &&
+      guides &&
+      prevState.guides.tentativeFeature !== guides.tentativeFeature
+    ) {
+      // re-calculate edit handles
+      this._refreshEditHandles();
     }
   }
 
@@ -121,22 +138,24 @@ export class ModeHandler extends EditMode<
     this._clickSequence = [];
   }
 
-  // TODO: delete me
+  // TODO: delete me once mode handlers do getEditHandles lazily
   getTentativeFeature(): ?Feature {
-    const guides = this.getGuides();
-    return guides && guides.tentativeFeature;
+    return this._tentativeFeature;
   }
 
-  // TODO: delete me
+  // TODO: delete me once mode handlers do getEditHandles lazily
   _setTentativeFeature(tentativeFeature: ?Feature): void {
-    this.getState().onUpdateGuides({ tentativeFeature, editHandles: this.getEditHandles() });
+    this._tentativeFeature = tentativeFeature;
+    this.getState().onUpdateGuides({
+      tentativeFeature,
+      editHandles: this.getEditHandlesAdapter()
+    });
   }
 
-  _refreshEditHandles(): void {
-    const guides = this.getGuides();
+  _refreshEditHandles(picks?: Array<Object>, mapCoords?: Position): void {
     this.getState().onUpdateGuides({
-      tentativeFeature: guides && guides.tentativeFeature,
-      editHandles: this.getEditHandles()
+      tentativeFeature: this.getTentativeFeature(),
+      editHandles: this.getEditHandlesAdapter(picks, mapCoords)
     });
   }
 
@@ -154,7 +173,11 @@ export class ModeHandler extends EditMode<
    *
    * @param featureIndex The index of the feature to get edit handles
    */
-  getEditHandles(picks?: Array<Object>, mapCoords?: Position): EditHandle[] {
+  getEditHandlesAdapter(
+    picks?: Array<Object>,
+    mapCoords?: Position,
+    tentativeFeature?: ?Feature
+  ): EditHandle[] {
     return DEFAULT_EDIT_HANDLES;
   }
 
@@ -277,7 +300,7 @@ export class ModeHandler extends EditMode<
   handleClick(event: ClickEvent): void {
     const editAction = this.handleClickAdapter(event);
 
-    this._refreshEditHandles();
+    this._refreshEditHandles(event.picks, event.mapCoords);
     if (editAction) {
       this.onEdit(editAction);
     }
@@ -293,7 +316,7 @@ export class ModeHandler extends EditMode<
     }
 
     this._refreshCursor();
-    this._refreshEditHandles();
+    this._refreshEditHandles(event.picks, event.mapCoords);
     if (editAction) {
       this.onEdit(editAction);
     }
@@ -302,7 +325,7 @@ export class ModeHandler extends EditMode<
   handleStartDragging(event: StartDraggingEvent): void {
     const editAction = this.handleStartDraggingAdapter(event);
 
-    this._refreshEditHandles();
+    this._refreshEditHandles(event.picks, event.mapCoords);
     if (editAction) {
       this.onEdit(editAction);
     }
@@ -311,7 +334,7 @@ export class ModeHandler extends EditMode<
   handleStopDragging(event: StopDraggingEvent): void {
     const editAction = this.handleStopDraggingAdapter(event);
 
-    this._refreshEditHandles();
+    this._refreshEditHandles(event.picks, event.mapCoords);
     if (editAction) {
       this.onEdit(editAction);
     }

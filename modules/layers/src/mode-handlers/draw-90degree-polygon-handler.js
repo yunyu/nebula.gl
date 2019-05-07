@@ -12,8 +12,8 @@ import type { FeatureCollectionEditAction, EditHandle } from './mode-handler.js'
 import { ModeHandler, getPickedEditHandle, getEditHandlesForGeometry } from './mode-handler.js';
 
 export class Draw90DegreePolygonHandler extends ModeHandler {
-  getEditHandles(picks?: Array<Object>, mapCoords?: Position): EditHandle[] {
-    let handles = super.getEditHandles(picks, mapCoords);
+  getEditHandlesAdapter(picks?: Array<Object>, mapCoords?: Position): EditHandle[] {
+    let handles = super.getEditHandlesAdapter(picks, mapCoords);
 
     const tentativeFeature = this.getTentativeFeature();
     if (tentativeFeature) {

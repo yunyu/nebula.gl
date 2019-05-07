@@ -26,7 +26,7 @@ export class ElevationHandler extends ModifyHandler {
       maxElevation = 20000,
       calculateElevationChange = defaultCalculateElevationChange
     } =
-      this._modeConfig || {};
+      this.getModeConfig() || {};
 
     // $FlowFixMe - really, I know it has something at index 2
     let elevation = position.length === 3 ? position[2] : 0;

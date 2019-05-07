@@ -196,12 +196,12 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     expect(intermediateHandles).toMatchSnapshot();
   });
 
-  test('getEditHandles()', () => {
+  test('getEditHandlesAdapter()', () => {
     snappableHandler.setSelectedFeatureIndexes([1]);
     snappableHandler.setModeConfig({ enableSnapping: true });
     snappableHandler._editHandlePicks = { pickedHandle: mockPickedHandle };
 
-    const allHandles = snappableHandler.getEditHandles();
+    const allHandles = snappableHandler.getEditHandlesAdapter();
     expect(allHandles.length).toEqual(14);
     expect(allHandles).toMatchSnapshot();
 
@@ -214,25 +214,25 @@ describe('SnappableHandler - TranslateHandler tests', () => {
     expect(intermediateHandles).toMatchSnapshot();
   });
 
-  test('getEditHandles() - no _editHandlePicks', () => {
+  test('getEditHandlesAdapter() - no _editHandlePicks', () => {
     snappableHandler.setModeConfig({ enableSnapping: true });
-    const allHandles = snappableHandler.getEditHandles();
+    const allHandles = snappableHandler.getEditHandlesAdapter();
     expect(allHandles.length > 0).toBeTruthy();
     expect(allHandles).toMatchSnapshot();
   });
 
-  test('getEditHandles() - enableSnapping not defined', () => {
+  test('getEditHandlesAdapter() - enableSnapping not defined', () => {
     snappableHandler._editHandlePicks = { pickedHandle: mockPickedHandle };
 
-    const allHandles = snappableHandler.getEditHandles();
+    const allHandles = snappableHandler.getEditHandlesAdapter();
     expect(allHandles.length).toEqual(0);
   });
 
-  test('getEditHandles() - selectedFeatureIndex greater than feature count', () => {
+  test('getEditHandlesAdapter() - selectedFeatureIndex greater than feature count', () => {
     snappableHandler.setModeConfig({ enableSnapping: true });
     translateHandler.setSelectedFeatureIndexes([1000]);
 
-    const allHandles = snappableHandler.getEditHandles();
+    const allHandles = snappableHandler.getEditHandlesAdapter();
     expect(allHandles.length).toEqual(0);
   });
 

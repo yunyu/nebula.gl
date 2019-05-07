@@ -113,9 +113,9 @@ export class SnappableHandler extends ModeHandler {
   // If no snap handle has been picked, only display the edit handles of the
   // selected feature. If a snap handle has been picked, display said snap handle
   // along with all snappable points on all non-selected features.
-  getEditHandles(picks?: Array<Object>, mapCoords?: Position): any[] {
+  getEditHandlesAdapter(picks?: Array<Object>, mapCoords?: Position): any[] {
     const { enableSnapping } = this._modeConfig || {};
-    const handles = this._handler.getEditHandles(picks, mapCoords);
+    const handles = this._handler.getEditHandlesAdapter(picks, mapCoords);
 
     if (!enableSnapping) return handles;
     const { pickedHandle } = this._editHandlePicks || {};

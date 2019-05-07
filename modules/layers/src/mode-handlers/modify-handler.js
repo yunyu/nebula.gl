@@ -16,7 +16,7 @@ import { ModeHandler, getPickedEditHandle, getEditHandlesForGeometry } from './m
 export class ModifyHandler extends ModeHandler {
   _lastPointerMovePicks: *;
 
-  getEditHandles(picks?: Array<Object>, mapCoords?: Position): EditHandle[] {
+  getEditHandlesAdapter(picks?: Array<Object>, mapCoords?: Position): EditHandle[] {
     let handles = [];
     const { features } = this.featureCollection.getObject();
 

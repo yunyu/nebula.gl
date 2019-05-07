@@ -780,7 +780,7 @@ Array [
 ]
 `;
 
-exports[`SnappableHandler - TranslateHandler tests getEditHandles() - no _editHandlePicks 1`] = `
+exports[`SnappableHandler - TranslateHandler tests getEditHandlesAdapter() - no _editHandlePicks 1`] = `
 Array [
   Object {
     "featureIndex": 1,
@@ -833,7 +833,7 @@ Array [
 ]
 `;
 
-exports[`SnappableHandler - TranslateHandler tests getEditHandles() 1`] = `
+exports[`SnappableHandler - TranslateHandler tests getEditHandlesAdapter() 1`] = `
 Array [
   Object {
     "featureIndex": 0,
@@ -1003,7 +1003,7 @@ Array [
 ]
 `;
 
-exports[`SnappableHandler - TranslateHandler tests getEditHandles() 2`] = `
+exports[`SnappableHandler - TranslateHandler tests getEditHandlesAdapter() 2`] = `
 Array [
   Object {
     "featureIndex": 0,
@@ -1020,7 +1020,7 @@ Array [
 ]
 `;
 
-exports[`SnappableHandler - TranslateHandler tests getEditHandles() 3`] = `
+exports[`SnappableHandler - TranslateHandler tests getEditHandlesAdapter() 3`] = `
 Array [
   Object {
     "featureIndex": 0,

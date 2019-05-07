@@ -73,7 +73,7 @@ beforeEach(() => {
   };
 });
 
-describe('getEditHandles()', () => {
+describe('getEditHandlesAdapter()', () => {
   it('gets edit handles for Point', () => {
     const features = new ModifyHandler({
       type: 'FeatureCollection',
@@ -81,7 +81,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0]);
 
-    const actual = features.getEditHandles();
+    const actual = features.getEditHandlesAdapter();
 
     const expected = [{ featureIndex: 0, position: [1, 2], positionIndexes: [], type: 'existing' }];
     expect(actual).toEqual(expected);
@@ -94,7 +94,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0]);
 
-    const actual = features.getEditHandles();
+    const actual = features.getEditHandlesAdapter();
 
     const expected = [
       { featureIndex: 0, position: [1, 2], positionIndexes: [0], type: 'existing' },
@@ -111,7 +111,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0]);
 
-    const actual = features.getEditHandles();
+    const actual = features.getEditHandlesAdapter();
 
     const expected = [
       { featureIndex: 0, position: [-1, -1], positionIndexes: [0, 0], type: 'existing' },
@@ -133,7 +133,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0]);
 
-    const actual = features.getEditHandles();
+    const actual = features.getEditHandlesAdapter();
 
     const expected = [
       { featureIndex: 0, position: [1, 2], positionIndexes: [0], type: 'existing' },
@@ -149,7 +149,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0]);
 
-    const actual = features.getEditHandles();
+    const actual = features.getEditHandlesAdapter();
 
     const expected = [
       { featureIndex: 0, position: [1, 2], positionIndexes: [0, 0], type: 'existing' },
@@ -169,7 +169,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0]);
 
-    const actual = features.getEditHandles();
+    const actual = features.getEditHandlesAdapter();
 
     const expected = [
       { featureIndex: 0, position: [-1, -1], positionIndexes: [0, 0, 0], type: 'existing' },
@@ -195,7 +195,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0, 2]);
 
-    const actual = features.getEditHandles();
+    const actual = features.getEditHandlesAdapter();
 
     const expected = [
       { featureIndex: 0, position: [1, 2], positionIndexes: [0], type: 'existing' },
@@ -245,7 +245,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0]);
 
-    const actual = features.getEditHandles([pick], mapCoords);
+    const actual = features.getEditHandlesAdapter([pick], mapCoords);
 
     const intermediate = actual.find(editHandle => editHandle.type === 'intermediate');
     expect(JSON.stringify(intermediate)).toBe(
@@ -265,7 +265,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0]);
 
-    const actual = features.getEditHandles(undefined, mapCoords);
+    const actual = features.getEditHandlesAdapter(undefined, mapCoords);
 
     const intermediate = actual.find(editHandle => editHandle.type === 'intermediate');
     expect(intermediate).toBeUndefined();
@@ -278,7 +278,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0]);
 
-    const actual = features.getEditHandles([], mapCoords);
+    const actual = features.getEditHandlesAdapter([], mapCoords);
 
     const intermediate = actual.find(editHandle => editHandle.type === 'intermediate');
     expect(intermediate).toBeUndefined();
@@ -291,7 +291,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0]);
 
-    const actual = features.getEditHandles([pick]);
+    const actual = features.getEditHandlesAdapter([pick]);
 
     const intermediate = actual.find(editHandle => editHandle.type === 'intermediate');
     expect(intermediate).toBeUndefined();
@@ -304,7 +304,7 @@ describe('getEditHandles()', () => {
     });
     features.setSelectedFeatureIndexes([0]);
 
-    const actual = features.getEditHandles(
+    const actual = features.getEditHandlesAdapter(
       [pick, { isGuide: true, object: { type: 'existing' } }],
       mapCoords
     );
@@ -319,7 +319,7 @@ describe('getEditHandles()', () => {
       features: [lineString]
     });
 
-    const actual = features.getEditHandles([pick], mapCoords);
+    const actual = features.getEditHandlesAdapter([pick], mapCoords);
 
     const intermediate = actual.find(editHandle => editHandle.type === 'intermediate');
     expect(intermediate).toBeUndefined();
@@ -331,7 +331,7 @@ describe('getEditHandles()', () => {
       features: [point]
     });
     features.setSelectedFeatureIndexes([0]);
-    const actual = features.getEditHandles([{ object: point, index: 0 }], mapCoords);
+    const actual = features.getEditHandlesAdapter([{ object: point, index: 0 }], mapCoords);
     const intermediate = actual.find(editHandle => editHandle.type === 'intermediate');
     expect(intermediate).toBeUndefined();
   });
