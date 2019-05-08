@@ -22,11 +22,6 @@ export class SnappableHandler extends ModeHandler {
     this._handler.setFeatureCollection(featureCollection);
   }
 
-  setModeConfig(modeConfig: any): void {
-    this._modeConfig = modeConfig;
-    this._handler.setModeConfig(modeConfig);
-  }
-
   setSelectedFeatureIndexes(indexes: number[]): void {
     this._handler.setSelectedFeatureIndexes(indexes);
   }
@@ -114,7 +109,7 @@ export class SnappableHandler extends ModeHandler {
   // selected feature. If a snap handle has been picked, display said snap handle
   // along with all snappable points on all non-selected features.
   getEditHandlesAdapter(picks?: Array<Object>, mapCoords?: Position): any[] {
-    const { enableSnapping } = this._modeConfig || {};
+    const { enableSnapping } = this.getModeConfig() || {};
     const handles = this._handler.getEditHandlesAdapter(picks, mapCoords);
 
     if (!enableSnapping) return handles;

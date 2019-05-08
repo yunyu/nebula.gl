@@ -279,8 +279,6 @@ export default class EditableGeoJsonLayer extends EditableLayer {
           this.setState({ modeHandler });
         }
       }
-
-      this.updateModeState(props);
     }
 
     let selectedFeatures = [];

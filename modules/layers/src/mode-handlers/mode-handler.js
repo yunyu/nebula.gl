@@ -37,12 +37,6 @@ export class ModeHandler extends EditMode<FeatureCollection, ModeHandlerGuides> 
   featureCollection: ImmutableFeatureCollection;
   _clickSequence: Position[] = [];
 
-  // TODO: delete once ModeHandlers get by calling getModeConfig()
-  _modeConfig: any = null;
-
-  // TODO: delete me once mode handlers do getEditHandles lazily
-  _tentativeFeature: ?Feature;
-
   constructor(featureCollection?: FeatureCollection) {
     super();
     if (featureCollection) {
@@ -138,17 +132,21 @@ export class ModeHandler extends EditMode<FeatureCollection, ModeHandlerGuides> 
     this._clickSequence = [];
   }
 
-  // TODO: delete me once mode handlers do getEditHandles lazily
   getTentativeFeature(): ?Feature {
-    return this._tentativeFeature;
+    const { tentativeFeature } = this.getGuides() || {};
+    return tentativeFeature;
+  }
+
+  getEditHandles(): EditHandle[] {
+    const { editHandles } = this.getGuides() || { editHandles: DEFAULT_EDIT_HANDLES };
+    return editHandles;
   }
 
   // TODO: delete me once mode handlers do getEditHandles lazily
   _setTentativeFeature(tentativeFeature: ?Feature): void {
-    this._tentativeFeature = tentativeFeature;
     this.getState().onUpdateGuides({
       tentativeFeature,
-      editHandles: this.getEditHandlesAdapter()
+      editHandles: this.getEditHandles()
     });
   }
 
