@@ -17,16 +17,16 @@ function defaultCalculateElevationChange({
 
 export class ElevationHandler extends ModifyHandler {
   makeElevatedEvent(event: PointerMoveEvent | StopDraggingEvent, position: Position): Object {
-    if (!event.pointerDownScreenCoords) {
-      return event;
-    }
-
     const {
       minElevation = 0,
       maxElevation = 20000,
       calculateElevationChange = defaultCalculateElevationChange
     } =
       this.getModeConfig() || {};
+
+    if (!event.pointerDownScreenCoords) {
+      return event;
+    }
 
     // $FlowFixMe - really, I know it has something at index 2
     let elevation = position.length === 3 ? position[2] : 0;
