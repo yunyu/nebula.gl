@@ -151,6 +151,13 @@ export class ModeHandler extends EditMode<FeatureCollection, ModeHandlerGuides> 
     });
   }
 
+  _setEditHandles(editHandles: EditHandle[]): void {
+    this.getState().onUpdateGuides({
+      tentativeFeature: this.getTentativeFeature(),
+      editHandles
+    });
+  }
+
   // TODO: delete me once mode handlers do getEditHandles lazily
   _refreshEditHandles(picks?: Array<Object>, mapCoords?: Position): void {
     this.getState().onUpdateGuides({
