@@ -618,18 +618,25 @@ export default class Editor extends PureComponent<EditorProps, EditorState> {
   };
 
   _getEditHandleState = (index: number, renderState: ?string) => {
+    const { mode } = this.props;
     const { draggingVertexIndex, hoveredVertexIndex } = this.state;
     const selectedFeature = this._getSelectedFeature();
+    const isSelected =
+      index === draggingVertexIndex ||
+      (selectedFeature && selectedFeature.renderType === RENDER_TYPE.POINT);
+    const isClosing = mode === MODES.DRAW_POLYGON && hoveredVertexIndex === 0 && index === -1;
+
     return renderState
       ? renderState
-      : index === draggingVertexIndex ||
-        (selectedFeature && selectedFeature.renderType === RENDER_TYPE.POINT)
-        ? RENDER_STATE.SELECTED
-        : index === hoveredVertexIndex
-          ? RENDER_STATE.HOVERED
-          : index === -1
-            ? RENDER_STATE.UNCOMMITTED
-            : RENDER_STATE.INACTIVE;
+      : isClosing
+        ? RENDER_STATE.CLOSING
+        : isSelected
+          ? RENDER_STATE.SELECTED
+          : index === hoveredVertexIndex
+            ? RENDER_STATE.HOVERED
+            : index === -1
+              ? RENDER_STATE.UNCOMMITTED
+              : RENDER_STATE.INACTIVE;
   };
 
   _getFeatureRenderState = (id: Id, renderState: ?string) => {
@@ -799,19 +806,24 @@ export default class Editor extends PureComponent<EditorProps, EditorState> {
     );
     /* eslint-enable no-inline-comments */
 
-    let uncommittedCloseSegment = null;
-    if (mode === MODES.DRAW_POLYGON && points.length > 2) {
+    return uncommittedSegments.filter(Boolean);
+  };
+
+  _renderClosingStroke = (featureIndex: number, feature: Feature, style: any) => {
+    const { points, isClosed } = feature;
+    const { mode } = this.props;
+    const { uncommittedLngLat } = this.state;
+    if (uncommittedLngLat && mode === MODES.DRAW_POLYGON && points.length > 2 && !isClosed) {
       // from uncommitted position to the first point of the polygon
-      uncommittedCloseSegment = this._renderSegment(
+      return this._renderSegment(
         featureIndex,
         'uncommitted-close',
         uncommittedLngLat,
         points[0],
-        { ...style, strokeDasharray: '4,2' }
+        style
       );
     }
-
-    return [...uncommittedSegments, uncommittedCloseSegment].filter(Boolean);
+    return null;
   };
 
   _renderFill = (index: number, feature: Feature, style: any) => {
@@ -851,25 +863,20 @@ export default class Editor extends PureComponent<EditorProps, EditorState> {
     const geoJson = feature.toFeature();
     const committedStyle = getFeatureStyle({ feature: geoJson, state: RENDER_STATE.SELECTED });
     const uncommittedStyle = getFeatureStyle({ feature: geoJson, state: RENDER_STATE.UNCOMMITTED });
+    const closingStyle = getFeatureStyle({ feature: geoJson, state: RENDER_STATE.CLOSING });
 
     const committedStroke = this._renderCommittedStroke(index, feature, committedStyle);
     const uncommittedStrokes =
       this._renderUncommittedStrokes(index, feature, uncommittedStyle) || [];
+    const closingStroke = this._renderClosingStroke(index, feature, closingStyle);
     const fill = this._renderFill(index, feature, uncommittedStyle);
 
-    return [fill, ...uncommittedStrokes, committedStroke].filter(Boolean);
+    return [fill, committedStroke, ...uncommittedStrokes, closingStroke].filter(Boolean);
   };
 
-  _renderCurrentVertices = (feature: Feature, featureIndex: number) => {
-    const { id, points, isClosed } = feature;
-
-    if (!points || !points.length) {
-      return null;
-    }
-
+  _renderCommittedVertices = (featureIndex: number, feature: Feature, geoJson: GeoJson) => {
     const { mode, getEditHandleStyle, getEditHandleShape } = this.props;
-    const { selectedFeatureId, uncommittedLngLat } = this.state;
-    const geoJson = feature.toFeature();
+    const { isClosed, points } = feature;
 
     const committedVertices = [];
     for (let i = 0; i < points.length; i++) {
@@ -901,6 +908,14 @@ export default class Editor extends PureComponent<EditorProps, EditorState> {
       }
     }
 
+    return committedVertices;
+  };
+
+  _renderUncommittedVertex = (featureIndex: number, feature: Feature, geoJson: GeoJson) => {
+    const { getEditHandleStyle, getEditHandleShape } = this.props;
+    const { selectedFeatureId, uncommittedLngLat } = this.state;
+    const { id } = feature;
+
     let uncommittedVertex = null;
     if (selectedFeatureId === id && uncommittedLngLat) {
       const style = getEditHandleStyle({
@@ -913,7 +928,7 @@ export default class Editor extends PureComponent<EditorProps, EditorState> {
           ? getEditHandleShape({
               feature: geoJson,
               index: -1,
-              state: RENDER_STATE.UNCOMMITTED
+              state: this._getEditHandleState(-1)
             })
           : getEditHandleShape;
 
@@ -926,6 +941,20 @@ export default class Editor extends PureComponent<EditorProps, EditorState> {
         shape
       );
     }
+
+    return uncommittedVertex;
+  };
+
+  _renderCurrentVertices = (feature: Feature, featureIndex: number) => {
+    const { points } = feature;
+
+    if (!points || !points.length) {
+      return null;
+    }
+
+    const geoJson = feature.toFeature();
+    const committedVertices = this._renderCommittedVertices(featureIndex, feature, geoJson);
+    const uncommittedVertex = this._renderUncommittedVertex(featureIndex, feature, geoJson);
 
     return (
       <g key="edit-handles">
